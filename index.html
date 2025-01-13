@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Form</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Order Your Jersey</h1>
+        <form id="orderForm">
+            <!-- Name -->
+            <label for="name">Name:</label>
+            <input type="text" id="name" required>
+
+            <!-- Email -->
+            <label for="email">Email:</label>
+            <input type="email" id="email" required>
+
+            <!-- Phone -->
+            <label for="phone">Phone:</label>
+            <input type="text" id="phone">
+
+            <!-- Jersey Name -->
+            <label for="jerseyName">Jersey Name:</label>
+            <input type="text" id="jerseyName" required>
+
+            <!-- Jersey Number -->
+            <label for="jerseyNumber">Jersey Number:</label>
+            <select id="jerseyNumber" required></select>
+
+            <!-- Note -->
+            <label for="note">Note:</label>
+            <textarea id="note"></textarea>
+
+            <!-- Submit Button -->
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
