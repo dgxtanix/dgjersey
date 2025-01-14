@@ -1,54 +1,44 @@
-document.addEventListener("DOMContentLoaded", function() {
-    // Function to populate jersey numbers dynamically
-    function populateJerseyNumbers() {
-        fetch('https://your-backend-api.com/api/stock')
-            .then(response => response.json())
-            .then(stock => {
-                const jerseySelect = document.getElementById('jerseyNumber');
-                jerseySelect.innerHTML = ''; // Clear any existing options
-                stock.forEach(number => {
-                    const option = document.createElement('option');
-                    option.value = number;
-                    option.textContent = number;
-                    jerseySelect.appendChild(option);
-                });
-            })
-            .catch(error => console.log('Error fetching stock:', error));
+// Initialize Firebase (your existing Firebase code)
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCFqT7P7_Ef-1AqjbQYbOBzt6xNvusT5WQ",
+  authDomain: "dgjerseyy.firebaseapp.com",
+  projectId: "dgjerseyy",
+  storageBucket: "dgjerseyy.firebasestorage.app",
+  messagingSenderId: "49173360743",
+  appId: "1:49173360743:web:bbcf340278e7e09deae4c2",
+  measurementId: "G-1Y88FRSGPH"
+};
+
+// Initialize Firebase app
+const app = initializeApp(firebaseConfig);
+
+// Initialize Firestore
+const db = getFirestore(app);
+
+// Function to add jerseys to Firestore
+async function addJerseys() {
+    // Loop to create 100 jerseys
+    for (let i = 1; i <= 100; i++) {
+        // Create a reference for each jersey document in Firestore
+        const jerseyDocRef = doc(db, "jerseys", `jersey_${i}`);
+
+        // Set jersey data with availability logic (e.g., 50 jerseys available, others out of stock)
+        const availability = i <= 50;  // Jerseys 1-50 are available, the rest are out of stock
+
+        // Add the jersey data to Firestore
+        await setDoc(jerseyDocRef, {
+            jerseyNumber: i,
+            available: availability
+        });
+
+        console.log(`Jersey ${i} added!`);
     }
+}
 
-    // Call function to populate jersey numbers when the page loads
-    populateJerseyNumbers();
-
-    // Handle form submission
-    document.getElementById("orderForm").addEventListener("submit", function (event) {
-        event.preventDefault();
-
-        const formData = {
-            from_name: document.getElementById('name').value,
-            reply_to: document.getElementById('email').value,
-            phone: document.getElementById('phone').value,
-            jersey_name: document.getElementById('jerseyName').value,
-            jersey_number: document.getElementById('jerseyNumber').value,
-            note: document.getElementById('note').value,
-        };
-
-        // Send order data to your backend API
-        fetch('https://your-backend-api.com/api/select-jersey', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ jerseyNumber: formData.jersey_number }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.message === 'Jersey selected successfully') {
-                alert("Your order has been submitted successfully! The jersey is now out of stock.");
-                populateJerseyNumbers(); // Refresh jersey numbers
-            } else {
-                alert("Sorry, this jersey is out of stock.");
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    });
+// Call the function to add jerseys to Firestore
+addJerseys().catch((error) => {
+    console.error("Error adding jerseys: ", error);
 });
