@@ -5,11 +5,86 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Form</title>
     <link rel="stylesheet" href="styles.css">
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCFqT7P7_Ef-1AqjbQYbOBzt6xNvusT5WQ",
+            authDomain: "dgjerseyy.firebaseapp.com",
+            projectId: "dgjerseyy",
+            storageBucket: "dgjerseyy.firebasestorage.app",
+            messagingSenderId: "49173360743",
+            appId: "1:49173360743:web:bbcf340278e7e09deae4c2",
+            measurementId: "G-1Y88FRSGPH"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Function to load available jersey numbers
+        function loadJerseyNumbers() {
+            const dbRef = ref(database, 'jerseys/');
+            get(dbRef).then((snapshot) => {
+                const jerseyNumberSelect = document.getElementById('jerseyNumber');
+                if (snapshot.exists()) {
+                    const jerseys = snapshot.val();
+                    Object.keys(jerseys).forEach(jerseyNumber => {
+                        if (jerseys[jerseyNumber].available) {
+                            const option = document.createElement('option');
+                            option.value = jerseyNumber;
+                            option.innerText = "Jersey " + jerseyNumber;
+                            jerseyNumberSelect.appendChild(option);
+                        }
+                    });
+                }
+            }).catch((error) => {
+                console.error('Error loading jersey numbers:', error);
+            });
+        }
+
+        // Function to check jersey availability and submit the order
+        function submitOrder(event) {
+            event.preventDefault();
+            
+            const jerseyNumber = document.getElementById('jerseyNumber').value;
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const note = document.getElementById('note').value;
+
+            // Check jersey availability
+            const dbRef = ref(database, 'jerseys/' + jerseyNumber);
+            get(dbRef).then((snapshot) => {
+                if (snapshot.exists() && snapshot.val().available) {
+                    // Mark as "out of stock"
+                    set(dbRef, {
+                        available: false
+                    }).then(() => {
+                        alert('Your order has been placed for Jersey number ' + jerseyNumber);
+                    }).catch((error) => {
+                        console.error('Error updating stock:', error);
+                    });
+                } else {
+                    alert('Sorry, Jersey number ' + jerseyNumber + ' is out of stock!');
+                }
+            }).catch((error) => {
+                console.error('Error checking jersey availability:', error);
+            });
+        }
+
+        // Load available jersey numbers when the page loads
+        window.onload = loadJerseyNumbers;
+    </script>
 </head>
 <body>
     <div class="container">
         <h1>Order Your Jersey</h1>
-        <form id="orderForm">
+        <form id="orderForm" onsubmit="submitOrder(event)">
             <!-- Name -->
             <label for="name">Name:</label>
             <input type="text" id="name" required>
